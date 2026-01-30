@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Little Shop - Math Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            padding: 12px;
+            background: #f0f4ff;
+            border-radius: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .score-value {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .shop-area {
+            margin: 15px 0;
+            padding: 15px;
+            background: #fff9e6;
+            border-radius: 15px;
+            border: 3px solid #ffd700;
+        }
+
+        .shop-title {
+            text-align: center;
+            font-size: 1.3em;
+            color: #ff6b6b;
+            margin-bottom: 12px;
+        }
+
+        .shelves {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .item {
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .item:hover {
+            transform: translateY(-3px);
+        }
+
+        .item-emoji {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .item-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 3px;
+            font-size: 0.9em;
+        }
+
+        .item-price {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .customer-area {
+            margin: 15px 0;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 15px;
+            border: 3px solid #4caf50;
+        }
+
+        .customer-speech {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .customer-emoji {
+            font-size: 3em;
+        }
+
+        .speech-bubble {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 25px;
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-right: 15px solid white;
+        }
+
+        .speech-text {
+            font-size: 1.1em;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .wanted-items {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .answer-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .answer-label {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #answer-input {
+            width: 120px;
+            padding: 12px;
+            font-size: 1.3em;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #submit-btn {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        #submit-btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+
+        #submit-btn:active {
+            transform: scale(0.95);
+        }
+
+        .feedback {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            min-height: 35px;
+        }
+
+        .correct {
+            color: #4caf50;
+            animation: bounce 0.5s;
+        }
+
+        .incorrect {
+            color: #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .awards {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .award {
+            font-size: 2.5em;
+            animation: award-pop 0.5s;
+        }
+
+        @keyframes award-pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5em;
+            animation: celebrate 1s;
+            pointer-events: none;
+        }
+
+        @keyframes celebrate {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5) rotate(180deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏪 Little Shop - Math Game</h1>
+        
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Current Score</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Correct Answers</div>
+                <div class="score-value" id="correct-count">0</div>
+            </div>
+        </div>
+
+        <div class="awards" id="awards"></div>
+
+        <div class="shop-area">
+            <div class="shop-title">🛒 Shop Shelves</div>
+            <div class="shelves" id="shelves"></div>
+        </div>
+
+        <div class="customer-area">
+            <div class="customer-speech">
+                <div class="customer-emoji">👧</div>
+                <div class="speech-bubble">
+                    <div class="speech-text" id="customer-text">
+                        Hello! I want to buy two items, they are <span class="wanted-items" id="wanted-items"></span>. How much do I need to pay in total?
+                    </div>
+                </div>
+            </div>
+
+            <div class="answer-area">
+                <label class="answer-label" for="answer-input">💰 Total:</label>
+                <input type="number" id="answer-input" placeholder="?" min="0">
+                <span class="answer-label">dollars</span>
+                <button id="submit-btn">Submit</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <script>
+        const items = [
+            { name: 'Apple', emoji: '🍎', price: 3 },
+            { name: 'Banana', emoji: '🍌', price: 2 },
+            { name: 'Orange', emoji: '🍊', price: 4 },
+            { name: 'Watermelon', emoji: '🍉', price: 8 },
+            { name: 'Milk', emoji: '🥛', price: 5 },
+            { name: 'Bread', emoji: '🍞', price: 6 },
+            { name: 'Cookie', emoji: '🍪', price: 3 },
+            { name: 'Cake', emoji: '🍰', price: 10 },
+            { name: 'Ice Cream', emoji: '🍦', price: 7 },
+            { name: 'Candy', emoji: '🍬', price: 2 },
+            { name: 'Chocolate', emoji: '🍫', price: 5 },
+            { name: 'Juice', emoji: '🧃', price: 4 },
+            { name: 'Strawberry', emoji: '🍓', price: 6 },
+            { name: 'Grape', emoji: '🍇', price: 7 },
+            { name: 'Chips', emoji: '🥔', price: 4 }
+        ];
+
+        let score = 0;
+        let correctCount = 0;
+        let currentItems = [];
+        let correctAnswer = 0;
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function displayShelves() {
+            const shelvesDiv = document.getElementById('shelves');
+            const shuffledItems = shuffleArray(items);
+            shelvesDiv.innerHTML = '';
+            
+            shuffledItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.innerHTML = `
+                    <div class="item-emoji">${item.emoji}</div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">$${item.price}</div>
+                `;
+                shelvesDiv.appendChild(itemDiv);
+            });
+        }
+
+        function newQuestion() {
+            const shuffled = shuffleArray(items);
+            currentItems = [shuffled[0], shuffled[1]];
+            correctAnswer = currentItems[0].price + currentItems[1].price;
+
+            const wantedItemsSpan = document.getElementById('wanted-items');
+            wantedItemsSpan.textContent = `${currentItems[0].emoji}${currentItems[0].name} and ${currentItems[1].emoji}${currentItems[1].name}`;
+
+            document.getElementById('answer-input').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer-input').value);
+            const feedback = document.getElementById('feedback');
+
+            if (isNaN(userAnswer)) {
+                feedback.textContent = 'Please enter a number!';
+                feedback.className = 'feedback incorrect';
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                score++;
+                correctCount++;
+                feedback.textContent = `🎉 Great job! Correct! ${currentItems[0].name} $${currentItems[0].price} + ${currentItems[1].name} $${currentItems[1].price} = $${correctAnswer}`;
+                feedback.className = 'feedback correct';
+
+                document.getElementById('score').textContent = score;
+                document.getElementById('correct-count').textContent = correctCount;
+
+                // 每5分给一个奖励
+                if (score % 5 === 0) {
+                    addAward();
+                    showCelebration();
+                }
+
+                setTimeout(() => {
+                    newQuestion();
+                }, 2000);
+            } else {
+                feedback.textContent = `❌ Try again! ${currentItems[0].name} $${currentItems[0].price} + ${currentItems[1].name} $${currentItems[1].price} = ?`;
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        function addAward() {
+            const awards = ['🏆', '🥇', '⭐', '🎖️', '👑', '💎'];
+            const randomAward = awards[Math.floor(Math.random() * awards.length)];
+            const awardsDiv = document.getElementById('awards');
+            
+            const awardSpan = document.createElement('span');
+            awardSpan.className = 'award';
+            awardSpan.textContent = randomAward;
+            awardsDiv.appendChild(awardSpan);
+        }
+
+        function showCelebration() {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.textContent = '🎊';
+            document.body.appendChild(celebration);
+
+            setTimeout(() => {
+                document.body.removeChild(celebration);
+            }, 1000);
+        }
+
+        document.getElementById('submit-btn').addEventListener('click', checkAnswer);
+        document.getElementById('answer-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // 初始化游戏
+        displayShelves();
+        newQuestion();
+    </script>
+</body>
+</html>

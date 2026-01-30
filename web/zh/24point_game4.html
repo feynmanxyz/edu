@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24点游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .numbers-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .number-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 3em;
+            font-weight: bold;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 1.5em;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .input-section input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .input-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            background: #51cf66;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background: #40c057;
+            transform: translateY(-2px);
+        }
+
+        .new-game-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .new-game-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .show-answer-btn {
+            background: #ff922b;
+            color: white;
+        }
+
+        .show-answer-btn:hover {
+            background: #fd7e14;
+            transform: translateY(-2px);
+        }
+
+        .message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #d3f9d8;
+            color: #2b8a3e;
+        }
+
+        .error {
+            background: #ffe3e3;
+            color: #c92a2a;
+        }
+
+        .solutions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .solutions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .solutions ul {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .solutions li {
+            padding: 8px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 5px;
+            color: #333;
+        }
+
+        .no-solution {
+            color: #fa5252;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 24点游戏</h1>
+        
+        <div class="numbers-display" id="numbersDisplay"></div>
+        
+        <div class="timer" id="timer">答案显示时间: 200秒</div>
+        
+        <div class="input-section">
+            <label for="answer">输入你的算式（例如: (1+2)*3+4）：</label>
+            <input type="text" id="answer" placeholder="请输入算式...">
+        </div>
+        
+        <div class="buttons">
+            <button class="show-answer-btn" onclick="showAnswerNow()">看答案</button>
+            <button class="submit-btn" onclick="submitAnswer()"> 提 交 答 案 </button>
+            <button class="new-game-btn" onclick="newGame()">新游戏</button>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div id="solutionsContainer"></div>
+    </div>
+
+    <script>
+        let currentNumbers = [];
+        let timer = null;
+        let timeLeft = 200;
+        let gameActive = false;
+
+        // 生成随机数字
+        function generateNumbers() {
+            currentNumbers = [];
+            for (let i = 0; i < 4; i++) {
+                currentNumbers.push(Math.floor(Math.random() * 10) + 1);
+            }
+            return currentNumbers;
+        }
+
+        // 显示数字
+        function displayNumbers() {
+            const display = document.getElementById('numbersDisplay');
+            display.innerHTML = '';
+            currentNumbers.forEach(num => {
+                const card = document.createElement('div');
+                card.className = 'number-card';
+                card.textContent = num;
+                display.appendChild(card);
+            });
+        }
+
+        // 开始计时器
+        function startTimer() {
+            timeLeft = 200;
+            updateTimerDisplay();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    gameActive = false;
+                    showSolutions();
+                }
+            }, 1000);
+        }
+
+        // 更新计时器显示
+        function updateTimerDisplay() {
+            document.getElementById('timer').textContent = `答案显示时间: ${timeLeft}秒`;
+        }
+
+        // 验证答案
+        function validateAnswer(expression, numbers) {
+            try {
+                // 检查是否只使用了给定的数字
+                const usedNumbers = [];
+                const numMatches = expression.match(/\d+/g);
+                
+                if (!numMatches || numMatches.length !== 4) {
+                    return { valid: false, message: '必须使用所有4个数字' };
+                }
+                
+                numMatches.forEach(num => usedNumbers.push(parseInt(num)));
+                
+                // 检查数字是否匹配
+                const sortedUsed = usedNumbers.slice().sort((a, b) => a - b);
+                const sortedGiven = numbers.slice().sort((a, b) => a - b);
+                
+                if (JSON.stringify(sortedUsed) !== JSON.stringify(sortedGiven)) {
+                    return { valid: false, message: '必须使用给定的数字，每个数字用且仅用一次' };
+                }
+                
+                // 计算结果
+                const result = eval(expression);
+                
+                if (Math.abs(result - 24) < 0.0001) {
+                    return { valid: true, message: '恭喜！答案正确！🎉' };
+                } else {
+                    return { valid: false, message: `结果是 ${result}，不等于24` };
+                }
+            } catch (e) {
+                return { valid: false, message: '表达式格式错误' };
+            }
+        }
+
+        // 提交答案
+        function submitAnswer() {
+            if (!gameActive) {
+                showMessage('游戏已结束', false);
+                return;
+            }
+            
+            const answer = document.getElementById('answer').value.trim();
+            
+            if (!answer) {
+                showMessage('请输入答案', false);
+                return;
+            }
+            
+            const result = validateAnswer(answer, currentNumbers);
+            showMessage(result.message, result.valid);
+            
+            if (result.valid) {
+                clearInterval(timer);
+                gameActive = false;
+                setTimeout(() => {
+                    showSolutions();
+                }, 1000);
+            }
+        }
+
+        // 显示消息
+        function showMessage(msg, isSuccess) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.className = 'message ' + (isSuccess ? 'success' : 'error');
+            messageDiv.style.display = 'block';
+        }
+
+        // 查找所有解决方案
+        function findAllSolutions(numbers) {
+            const solutions = new Set();
+            const ops = ['+', '-', '*', '/'];
+            
+            // 生成所有数字排列
+            function permute(arr) {
+                if (arr.length <= 1) return [arr];
+                const result = [];
+                for (let i = 0; i < arr.length; i++) {
+                    const rest = permute(arr.slice(0, i).concat(arr.slice(i + 1)));
+                    rest.forEach(perm => result.push([arr[i]].concat(perm)));
+                }
+                return result;
+            }
+            
+            const numPerms = permute(numbers);
+            
+            // 对每个数字排列，尝试所有运算符组合和括号组合
+            numPerms.forEach(nums => {
+                // 三个运算符的所有组合
+                for (let op1 of ops) {
+                    for (let op2 of ops) {
+                        for (let op3 of ops) {
+                            // 尝试不同的括号组合
+                            const expressions = [
+                                `((${nums[0]}${op1}${nums[1]})${op2}${nums[2]})${op3}${nums[3]}`,
+                                `(${nums[0]}${op1}(${nums[1]}${op2}${nums[2]}))${op3}${nums[3]}`,
+                                `(${nums[0]}${op1}${nums[1]})${op2}(${nums[2]}${op3}${nums[3]})`,
+                                `${nums[0]}${op1}((${nums[1]}${op2}${nums[2]})${op3}${nums[3]})`,
+                                `${nums[0]}${op1}(${nums[1]}${op2}(${nums[2]}${op3}${nums[3]}))`,
+                            ];
+                            
+                            expressions.forEach(expr => {
+                                try {
+                                    const result = eval(expr);
+                                    if (Math.abs(result - 24) < 0.0001) {
+                                        solutions.add(expr);
+                                    }
+                                } catch (e) {
+                                    // 忽略除零等错误
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+            
+            return Array.from(solutions);
+        }
+
+        // 显示所有解决方案
+        function showSolutions() {
+            const container = document.getElementById('solutionsContainer');
+            const solutions = findAllSolutions(currentNumbers);
+            
+            if (solutions.length > 0) {
+                container.innerHTML = `
+                    <div class="solutions">
+                        <h3>所有可能的解法 (共${solutions.length}个)：</h3>
+                        <ul>
+                            ${solutions.map(sol => `<li>${sol} = 24</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="solutions">
+                        <h3 class="no-solution">这组数字无解！</h3>
+                    </div>
+                `;
+            }
+        }
+
+        // 直接看答案
+        function showAnswerNow() {
+            if (!gameActive) {
+                return;
+            }
+            clearInterval(timer);
+            gameActive = false;
+            showSolutions();
+        }
+
+        // 开始新游戏
+        function newGame() {
+            clearInterval(timer);
+            document.getElementById('answer').value = '';
+            document.getElementById('message').style.display = 'none';
+            document.getElementById('solutionsContainer').innerHTML = '';
+            
+            generateNumbers();
+            displayNumbers();
+            gameActive = true;
+            startTimer();
+        }
+
+        // 回车提交
+        document.getElementById('answer').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitAnswer();
+            }
+        });
+
+        // 初始化游戏
+        newGame();
+    </script>
+</body>
+</html>
