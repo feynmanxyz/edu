@@ -187,15 +187,173 @@
             color: #fa5252;
             font-style: italic;
         }
+
+        .trophy-container {
+            text-align: center;
+            min-height: 40px;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .trophy {
+            display: inline-block;
+            animation: trophyPop 0.5s ease-out;
+            margin: 0 5px;
+        }
+
+        @keyframes trophyPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .button-pad {
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .number-buttons, .operator-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .operator-buttons {
+            margin-bottom: 0;
+        }
+
+        .pad-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2em;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .pad-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .pad-btn:active {
+            transform: translateY(0);
+        }
+
+        .pad-btn.operator {
+            background: #fff3bf;
+            color: #f08c00;
+        }
+
+        .pad-btn.clear {
+            background: #ffe3e3;
+            color: #c92a2a;
+            width: 80px;
+        }
+
+        .pad-btn.backspace {
+            background: #e3f2ff;
+            color: #1971c2;
+            width: 60px;
+        }
+
+        .close-button-container {
+            margin-top: 30px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .close-page-btn {
+            background: #868e96;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .close-page-btn:hover {
+            background: #495057;
+            transform: translateY(-2px);
+        }
+
+        .star {
+            position: fixed;
+            font-size: 2em;
+            animation: starFall 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes starFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .funny-emoji {
+            font-size: 3em;
+            text-align: center;
+            margin: 20px 0;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="trophy-container" id="trophyContainer"></div>
+        
         <h1>🎯 24 Point Game</h1>
         
         <div class="numbers-display" id="numbersDisplay"></div>
         
         <div class="timer" id="timer">Answer display time: 200s</div>
+        
+        <div class="button-pad">
+            <div class="number-buttons">
+                <button class="pad-btn" onclick="insertSymbol('1')">1</button>
+                <button class="pad-btn" onclick="insertSymbol('2')">2</button>
+                <button class="pad-btn" onclick="insertSymbol('3')">3</button>
+                <button class="pad-btn" onclick="insertSymbol('4')">4</button>
+                <button class="pad-btn" onclick="insertSymbol('5')">5</button>
+                <button class="pad-btn" onclick="insertSymbol('6')">6</button>
+                <button class="pad-btn" onclick="insertSymbol('7')">7</button>
+                <button class="pad-btn" onclick="insertSymbol('8')">8</button>
+                <button class="pad-btn" onclick="insertSymbol('9')">9</button>
+                <button class="pad-btn" onclick="insertSymbol('0')">0</button>
+            </div>
+            <div class="operator-buttons">
+                <button class="pad-btn operator" onclick="insertSymbol('+')">+</button>
+                <button class="pad-btn operator" onclick="insertSymbol('-')">-</button>
+                <button class="pad-btn operator" onclick="insertSymbol('*')">×</button>
+                <button class="pad-btn operator" onclick="insertSymbol('/')">/</button>
+                <button class="pad-btn operator" onclick="insertSymbol('(')">(</button>
+                <button class="pad-btn operator" onclick="insertSymbol(')')">)</button>
+                <button class="pad-btn clear" onclick="clearInput()">Clear</button>
+                <button class="pad-btn backspace" onclick="backspace()">⌫</button>
+            </div>
+        </div>
         
         <div class="input-section">
             <label for="answer">Enter your expression (e.g., (1+2)*3+4):</label>
@@ -211,6 +369,10 @@
         <div id="message"></div>
         
         <div id="solutionsContainer"></div>
+        
+        <div class="close-button-container">
+            <button class="close-page-btn" onclick="window.close()">Close Page</button>
+        </div>
     </div>
 
     <script>
@@ -218,6 +380,66 @@
         let timer = null;
         let timeLeft = 200;
         let gameActive = false;
+        let correctAnswers = 0;
+
+        // 创建星星庆祝效果
+        function createStars() {
+            const starSymbols = ['⭐', '🌟', '✨', '💫', '🎉', '🎊'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.textContent = starSymbols[Math.floor(Math.random() * starSymbols.length)];
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = -50 + 'px';
+                    document.body.appendChild(star);
+                    
+                    setTimeout(() => {
+                        star.remove();
+                    }, 2000);
+                }, i * 50);
+            }
+        }
+
+        // 添加奖杯
+        function addTrophy() {
+            correctAnswers++;
+            const trophyContainer = document.getElementById('trophyContainer');
+            const trophy = document.createElement('span');
+            trophy.className = 'trophy';
+            trophy.textContent = '🏆';
+            trophyContainer.appendChild(trophy);
+        }
+
+        // 插入符号到输入框
+        function insertSymbol(symbol) {
+            const input = document.getElementById('answer');
+            const cursorPos = input.selectionStart;
+            const textBefore = input.value.substring(0, cursorPos);
+            const textAfter = input.value.substring(cursorPos);
+            input.value = textBefore + symbol + textAfter;
+            input.focus();
+            input.setSelectionRange(cursorPos + 1, cursorPos + 1);
+        }
+
+        // 清空输入框
+        function clearInput() {
+            document.getElementById('answer').value = '';
+            document.getElementById('answer').focus();
+        }
+
+        // 退格
+        function backspace() {
+            const input = document.getElementById('answer');
+            const cursorPos = input.selectionStart;
+            if (cursorPos > 0) {
+                const textBefore = input.value.substring(0, cursorPos - 1);
+                const textAfter = input.value.substring(cursorPos);
+                input.value = textBefore + textAfter;
+                input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+            }
+            input.focus();
+        }
 
         // 生成随机数字
         function generateNumbers() {
@@ -314,6 +536,8 @@
             showMessage(result.message, result.valid);
             
             if (result.valid) {
+                createStars();
+                addTrophy();
                 clearInterval(timer);
                 gameActive = false;
                 setTimeout(() => {
@@ -396,9 +620,13 @@
                     </div>
                 `;
             } else {
+                const funnyEmojis = ['🤷‍♂️', '😅', '🙈', '🤔', '😬', '🫠', '😵‍💫', '🤯', '💀', '😱'];
+                const randomEmoji = funnyEmojis[Math.floor(Math.random() * funnyEmojis.length)];
                 container.innerHTML = `
                     <div class="solutions">
+                        <div class="funny-emoji">${randomEmoji}</div>
                         <h3 class="no-solution">No solution for this set of numbers!</h3>
+                        <p style="text-align: center; color: #868e96; margin-top: 10px;">Don't worry, it happens! Try a new game.</p>
                     </div>
                 `;
             }
