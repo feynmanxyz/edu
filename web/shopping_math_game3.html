@@ -455,7 +455,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏪 Little Shop - Math Game Gr 1</h1>
+        <h1>🏪 Little Shop - Math Game Gr 3</h1>
         
         <div class="score-board">
             <div class="score-item">
@@ -580,15 +580,14 @@
         }
 
         function generateQuestion() {
-            //const questionType = Math.floor(Math.random() * 3);
-	    const questionType=0;
+            const questionType = Math.floor(Math.random() * 3);
             const shuffled = shuffleArray(items);
             currentItems = [];
             correctAnswer = 0;
 
             if (questionType === 0) {
-                // 2种商品，各1个
-                for (let i = 0; i < 2; i++) {
+                // 3种商品，各1个
+                for (let i = 0; i < 3; i++) {
                     currentItems.push({ item: shuffled[i], quantity: 1 });
                     correctAnswer += shuffled[i].price;
                 }
