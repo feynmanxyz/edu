@@ -328,20 +328,11 @@
         
         <div class="numbers-display" id="numbersDisplay"></div>
         
-        <div class="timer" id="timer">Answer display time: 200s</div>
+        <div class="timer" id="timer">Answer display timer: 200s</div>
         
         <div class="button-pad">
-            <div class="number-buttons">
-                <button class="pad-btn" onclick="insertSymbol('1')">1</button>
-                <button class="pad-btn" onclick="insertSymbol('2')">2</button>
-                <button class="pad-btn" onclick="insertSymbol('3')">3</button>
-                <button class="pad-btn" onclick="insertSymbol('4')">4</button>
-                <button class="pad-btn" onclick="insertSymbol('5')">5</button>
-                <button class="pad-btn" onclick="insertSymbol('6')">6</button>
-                <button class="pad-btn" onclick="insertSymbol('7')">7</button>
-                <button class="pad-btn" onclick="insertSymbol('8')">8</button>
-                <button class="pad-btn" onclick="insertSymbol('9')">9</button>
-                <button class="pad-btn" onclick="insertSymbol('0')">0</button>
+            <div class="number-buttons" id="numberButtons">
+                <!-- 数字按钮将动态生成 -->
             </div>
             <div class="operator-buttons">
                 <button class="pad-btn operator" onclick="insertSymbol('+')">+</button>
@@ -460,6 +451,22 @@
                 card.textContent = num;
                 display.appendChild(card);
             });
+            
+            // 生成数字按钮
+            generateNumberButtons();
+        }
+
+        // 生成数字按钮
+        function generateNumberButtons() {
+            const buttonContainer = document.getElementById('numberButtons');
+            buttonContainer.innerHTML = '';
+            currentNumbers.forEach(num => {
+                const button = document.createElement('button');
+                button.className = 'pad-btn';
+                button.textContent = num;
+                button.onclick = () => insertSymbol(num);
+                buttonContainer.appendChild(button);
+            });
         }
 
         // 开始计时器
@@ -481,7 +488,7 @@
 
         // 更新计时器显示
         function updateTimerDisplay() {
-            document.getElementById('timer').textContent = `Answer display time: ${timeLeft}s`;
+            document.getElementById('timer').textContent = `Answer display timer: ${timeLeft}s`;
         }
 
         // 验证答案
