@@ -455,12 +455,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏪 Little Shop - Math Game Gr 2</h1>
+        <h1>🏪 三年级商店数学游戏</h1>
         
         <div class="score-board">
             <div class="score-item">
                 <span class="score-icon">⭐</span>
-                <span class="score-label">Good Helper</span>
+                <span class="score-label">小帮手</span>
             </div>
             <div class="score-item">
                 <div class="trophies-display" id="trophies"></div>
@@ -472,7 +472,7 @@
         </div>
 
         <div class="shop-area">
-            <div class="shop-title">🛒 Shop Shelves</div>
+            <div class="shop-title">🛒 货架商品单价</div>
             <div class="shelves" id="shelves"></div>
         </div>
 
@@ -481,10 +481,10 @@
                 <div class="customer-emoji">👧</div>
                 <div class="speech-bubble">
                     <div class="speech-text">
-                        Hello! I want to buy some items. How much do I need to pay in total?
+                        你好，我想要买些东西。请帮我计算需要付多少钱？
                     </div>
                     <div class="wanted-items-display">
-                        <div class="wanted-items-title">Items to buy:</div>
+                        <div class="wanted-items-title">我要买:</div>
                         <div class="wanted-items-list" id="wanted-items"></div>
                     </div>
                 </div>
@@ -501,46 +501,46 @@
                 <button class="number-btn" data-num="8">8</button>
                 <button class="number-btn" data-num="9">9</button>
                 <button class="number-btn" data-num="0">0</button>
-                <button class="number-btn clear" id="clear-btn">Clear</button>
-                <button class="number-btn" id="num-submit-btn">✓ Submit</button>
+                <button class="number-btn clear" id="clear-btn">清空</button>
+                <button class="number-btn" id="num-submit-btn">✓ 提交答案</button>
             </div>
 
             <div class="answer-area">
-                <label class="answer-label" for="answer-input">💰 Total:</label>
+                <label class="answer-label" for="answer-input">💰 要付:</label>
                 <input type="number" id="answer-input" placeholder="?" min="0" readonly>
-                <span class="answer-label">dollars</span>
+                <span class="answer-label">元</span>
             </div>
 
             <div class="feedback" id="feedback"></div>
         </div>
 
         <div class="game-over-area">
-            <button class="end-game-btn" id="end-game-btn">End Game</button>
+            <button class="end-game-btn" id="end-game-btn">结束游戏</button>
             <div class="final-result" id="final-result">
-                <h2>🎊 Congratulations! 🎊</h2>
+                <h2>🎊 谢谢你，小帮手! 🎊</h2>
                 <div class="final-stats">
-                    <div>Your Final Score: <strong id="final-score">0</strong> 🏅</div>
+                    <div>你的得分: <strong id="final-score">0</strong> 🏅</div>
                     <div class="final-trophies" id="final-trophies"></div>
                 </div>
-                <button class="close-page-btn" id="close-page-btn">Close This Page</button>
+                <button class="close-page-btn" id="close-page-btn">关闭本页</button>
             </div>
         </div>
     </div>
 
     <script>
         const items = [
-            { name: 'Apple', emoji: '🍎', price: 3 },
-            { name: 'Banana', emoji: '🍌', price: 2 },
-            { name: 'Orange', emoji: '🍊', price: 4 },
-            { name: 'Watermelon', emoji: '🍉', price: 8 },
-            { name: 'Milk', emoji: '🥛', price: 5 },
-            { name: 'Cake', emoji: '🍰', price: 11 },
-            { name: 'Ice Cream', emoji: '🍦', price: 7 },
-            { name: 'Candy', emoji: '🍬', price: 3 },
-            { name: 'Chocolate', emoji: '🍫', price: 10 },
-            { name: 'Juice', emoji: '🧃', price: 5 },
-            { name: 'Strawberry', emoji: '🍓', price: 6 },
-            { name: 'Grape', emoji: '🍇', price: 9 },
+            { name: '苹果', emoji: '🍎', price: 3 },
+            { name: '香蕉', emoji: '🍌', price: 2 },
+            { name: '橙子', emoji: '🍊', price: 4 },
+            { name: '西瓜', emoji: '🍉', price: 8 },
+            { name: '牛奶', emoji: '🥛', price: 5 },
+            { name: '蛋糕', emoji: '🍰', price: 11 },
+            { name: '冰淇淋', emoji: '🍦', price: 7 },
+            { name: '糖果', emoji: '🍬', price: 3 },
+            { name: '巧克力', emoji: '🍫', price: 10 },
+            { name: '果汁', emoji: '🧃', price: 5 },
+            { name: '草莓', emoji: '🍓', price: 6 },
+            { name: '葡萄', emoji: '🍇', price: 9 },
         ];
 
         let score = 0;
@@ -570,14 +570,14 @@
                 itemDiv.innerHTML = `
                     <div class="item-emoji">${item.emoji}</div>
                     <div class="item-name">${item.name}</div>
-                    <div class="item-price">$${item.price}</div>
+                    <div class="item-price">￥${item.price}</div>
                 `;
                 shelvesDiv.appendChild(itemDiv);
             });
         }
 
         function generateQuestion() {
-            const questionType = Math.floor(Math.random() * 2);
+            const questionType = Math.floor(Math.random() * 3);
             const shuffled = shuffleArray(items);
             currentItems = [];
             correctAnswer = 0;
@@ -628,7 +628,7 @@
             const feedback = document.getElementById('feedback');
 
             if (isNaN(userAnswer) || userAnswer === 0) {
-                feedback.textContent = 'Please enter a number!';
+                feedback.textContent = '请输入数字!';
                 feedback.className = 'feedback incorrect';
                 return;
             }
@@ -640,11 +640,11 @@
                 // 构建计算说明
                 const calculation = currentItems.map(ci => 
                     ci.quantity > 1 
-                        ? `${ci.item.name} $${ci.item.price} x${ci.quantity}` 
-                        : `${ci.item.name} $${ci.item.price}`
+                        ? `${ci.item.name} ￥${ci.item.price} x${ci.quantity}` 
+                        : `${ci.item.name} ￥${ci.item.price}`
                 ).join(' + ');
                 
-                feedback.textContent = `🎉 Great job! Correct! ${calculation} = $${correctAnswer}`;
+                feedback.textContent = `🎉 正确，你太棒了!  ${calculation} = ￥${correctAnswer}`;
                 feedback.className = 'feedback correct';
 
                 document.getElementById('score').textContent = score;
@@ -668,7 +668,7 @@
                         : `${ci.item.name} $${ci.item.price}`
                 ).join(' + ');
                 
-                feedback.textContent = `❌ Try again! ${calculation} = ?`;
+                feedback.textContent = `❌ 不对，再试试! ${calculation} = ?`;
                 feedback.className = 'feedback incorrect';
             }
         }

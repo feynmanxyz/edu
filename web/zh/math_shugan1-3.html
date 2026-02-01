@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gr1 Number Sense</title>
+    <title>一年级数感</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -422,7 +422,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Gr1 Number Sense:  Addition (Jump from Any Point)</h1>
+            <h1>一年级数感：减法找数轴位置（反向再跳）</h1>
         </div>
 
         <div id="gameScreen">
@@ -439,7 +439,7 @@
             </div>
 
             <div class="timer">
-                Eye Rest Timer：<span id="timerDisplay">5:00</span>
+                用眼休息：<span id="timerDisplay">5:00</span>
             </div>
 
             <div class="number-line-container">
@@ -449,7 +449,7 @@
             </div>
 
             <div class="question-prompt" id="questionPrompt">
-                ❓ What is the position after jumping once more from the starting point?
+                ❓ 从起点再跳一次后的位置数是多少？
             </div>
 
             <div class="input-area">
@@ -457,18 +457,17 @@
             </div>
 
             <div style="text-align: center;">
-                <button class="submit-btn" id="submitBtn">Submit Answer</button>
+                <button class="submit-btn" id="submitBtn">提交答案</button>
             </div>
 
             <div class="feedback" id="feedback"></div>
 
-            <div class="hint">Observe the landing point of the first jump to determine how many squares to jump each time. Count the number of squares after the second jump, noting that the jumps are in reverse order. 
-                <br>Earn 1 point for each correct answer, deduct 1 point for consecutive incorrect answers, and receive a badge for every 5 points earned. Good luck!
+            <div class="hint">观察第一跳落点确定每次跳几格，数一数再跳一次后落点的数值，注意反向。<br>每次答对得1分，连续答错扣1分，每得5分得一个徽章。加油！
             </div>
 
             <div class="end-btn-container">
-                <button class="submit-btn end-btn" id="endBtn">End Game</button>
-                <br><button class="submit-btn end-btn" id="closeBtn1" onclick="closeWindow()" style="margin-top: 15px; background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">Close Window</button>
+                <button class="submit-btn end-btn" id="endBtn">结束并保存</button>
+                <br><button class="submit-btn end-btn" id="closeBtn1" onclick="closeWindow()" style="margin-top: 15px; background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">关闭本页</button>
             </div>
         </div>
 
@@ -593,20 +592,22 @@
             // 随机选择动物图标
             currentAnimal = animalIcons[Math.floor(Math.random() * animalIcons.length)];
             
-            // 随机选择起点（1-20之间）
-            startPoint = Math.floor(Math.random() * 80) + 1; // 1-20
+            // 随机选择起点（-20到20之间，排除0）
+            do {
+                startPoint = Math.floor(Math.random() * 70) + 30; // 30到99
+            } while (startPoint === 0);
             
             // 随机选择每次跳跃的间隔（2-5）
             jumpStep = Math.floor(Math.random() * 4) + 2; // 2, 3, 4, 5
-                        
-            // 计算第一次跳跃和最终落点
-            const firstJumpValue = startPoint + jumpStep;
-            const finalPosition = startPoint + (jumpStep * 2); // totalJumps);
+            
+            // 计算第一次跳跃和最终落点（反方向，所以是减）
+            const firstJumpValue = startPoint - jumpStep;
+            const finalPosition = startPoint - (jumpStep * 2);// totalJumps);
             currentAnswer = finalPosition;
             
-            // 数轴范围：从起点前几格到最终落点后几格
-            const minValue = Math.max(0, startPoint - 3);
-            const maxValue = finalPosition + 3;
+            // 数轴范围：需要包含起点和最终落点
+            const minValue = Math.min(startPoint, finalPosition) - 3;
+            const maxValue = Math.max(startPoint, finalPosition) + 3;
             const totalRange = maxValue - minValue;
             
             // 绘制刻度线（每个单位一个刻度）
@@ -629,7 +630,7 @@
             // 添加"起点"标签（在数轴上方）
             const startLabel = document.createElement('div');
             startLabel.className = 'label';
-            startLabel.textContent = 'Start';
+            startLabel.textContent = '起点';
             startLabel.style.left = `${startPosition}%`;
             startLabel.style.color = '#3498db';
             startLabel.style.top = '-50px';
@@ -662,6 +663,15 @@
             firstJumpLabel.style.fontSize = '1.4em';
             firstJumpLabel.style.fontWeight = 'bold';
             mainLine.appendChild(firstJumpLabel);
+            
+            // 在第一次跳跃位置添加动物图标（反向时翻转）
+            const animalIcon = document.createElement('i');
+            animalIcon.className = `fas ${currentAnimal} animal-icon`;
+            animalIcon.style.left = `${firstJumpPosition}%`;
+            animalIcon.style.color = '#27ae60';
+            // 反向跳跃时翻转动物图标（从右往左）
+            animalIcon.style.transform = 'translateX(-50%) scaleX(-1)';
+            mainLine.appendChild(animalIcon);
 
             // 标记最终落点（红色未知点）
             const finalPosPercent = ((finalPosition - minValue) / totalRange) * 100;
@@ -675,24 +685,18 @@
             finalLabel.textContent = '?';
             finalLabel.style.left = `${finalPosPercent}%`;
             mainLine.appendChild(finalLabel);
-            
-            // 在第一次跳跃位置添加动物图标
-            const animalIcon = document.createElement('i');
-            animalIcon.className = `fas ${currentAnimal} animal-icon`;
-            animalIcon.style.left = `${firstJumpPosition}%`;
-            animalIcon.style.color = '#27ae60';
-            mainLine.appendChild(animalIcon);
-            
-            // 添加从起点到第一次跳跃位置的弧线
+                        
+            // 添加从起点到第一次跳跃位置的弧线（反向跳跃）
             const jumpArc = document.createElement('div');
             jumpArc.className = 'jump-arc';
-            jumpArc.style.left = `${startPosition}%`;
-            jumpArc.style.width = `${firstJumpPosition - startPosition}%`;
+            // 反向跳跃：弧线从第一次跳跃位置开始，宽度是两点距离的绝对值
+            jumpArc.style.left = `${firstJumpPosition}%`;
+            jumpArc.style.width = `${Math.abs(startPosition - firstJumpPosition)}%`;
             mainLine.appendChild(jumpArc);
             
             // 更新问题提示
             const questionPrompt = document.getElementById('questionPrompt');
-            questionPrompt.textContent = `❓ What will the position be after jumping once more? (Two jumps in total, red dot position)`;
+            questionPrompt.textContent = `❓ 从起点再跳一次后的位置数是多少？（总共两跳，红点位置）`;
             
             // 添加箭头表示正方向
             const arrow = document.createElement('div');
@@ -764,7 +768,7 @@
             const feedback = document.getElementById('feedback');
             
             if (isNaN(userAnswer)) {
-                feedback.textContent = 'Please Input Number！';
+                feedback.textContent = '请输入数字！';
                 feedback.className = 'feedback incorrect';
                 return;
             }
@@ -772,7 +776,7 @@
             if (userAnswer === currentAnswer) {
                 score++;
                 updateScore();
-                feedback.textContent = 'You got it right. Amazing!';
+                feedback.textContent = '答对了，你太棒了！';
                 feedback.className = 'feedback correct';
                 
                 // 检查是否获得徽章
@@ -795,17 +799,17 @@
                 failcnt=0;
             } else {
                 failcnt=failcnt+1;
-                if(failcnt<failmax)feedback.textContent = 'Keep going, try again!';
+                if(failcnt<failmax)feedback.textContent = '加油，再试一次！';
                 else if(failcnt==failmax){
                     score = Math.max(0, score - 1); // 扣1分，但不低于0
                     updateScore();
                     updateStamps(); // 同步更新徽章数量
-                    feedback.textContent = 'Keep trying! Check carefully and try again! (1 point has been deducted for consecutive errors.)';
+                    feedback.textContent = '加油，仔细检查后可再试一次！(连续不对，已扣1分)';
                 }else {
                     setTimeout(() => {
                         generateQuestion();
                     }, 1500);  // 延迟生成下一题
-                    feedback.textContent = 'If wrong after multiple times, switch to a new question.';
+                    feedback.textContent = '连续多次不对，更换新题。';
                 }
                 feedback.className = 'feedback incorrect';
                 document.getElementById('answerInput').value = '';
@@ -850,12 +854,12 @@
                 });
                 
                 if (response.ok) {
-                    console.log('Score uploaded successfully');
+                    console.log('分数上传成功');
                 } else {
-                    console.error('Score uploaded failed');
+                    console.error('分数上传失败');
                 }
             } catch (error) {
-                console.error('Score uploaded error:', error);
+                console.error('分数上传错误:', error);
             }
             
             const gameScreen = document.getElementById('gameScreen');
@@ -865,24 +869,24 @@
             endScreen.classList.remove('hidden');
             
             let message = '';
-            if (score < 15) {
-                message = 'Keep Going！';
-            } else if (score < 25) {
-                message = 'You are awesome！';
+            if (score < 5) {
+                message = '继续加油！';
+            } else if (score < 15) {
+                message = '你真棒！';
             } else {
-                message = 'You are a little genius!！';
+                message = '你真是个小天才！';
             }
             
             const stampCount = Math.floor(score / 5);
             
             endScreen.innerHTML = `
-                <h2>🎉 Great, you have completed this exercise.！</h2>
-                <div class="final-score">The score：${score} </div>
-                <div class="final-score">Stamps：${stampCount} </div>
+                <h2>🎉 太棒了，你已完成本次练习！</h2>
+                <div class="final-score">本次得分：${score} 分</div>
+                <div class="final-score">获得徽章：${stampCount} 个</div>
                 <div class="message">${message}</div>
-                <div class="rest-message">Take a break; your eyes and brain need to relax. 😊</div>
-                <div class="rest-message" style="color: #27ae60; font-size: 1.2em; margin-top: 10px;">✓ Good Job.</div>
-                <button class="submit-btn restart-btn" onclick="restartGame()">Try Again</button>
+                <div class="rest-message">休息一下，眼睛和大脑都需要放松哦 😊</div>
+                <div class="rest-message" style="color: #27ae60; font-size: 1.2em; margin-top: 10px;">✓ 分数已经上传保存</div>
+                <button class="submit-btn restart-btn" onclick="restartGame()">再来一次</button>
             `;
         }
 
@@ -915,7 +919,7 @@
         // 初始化游戏
         generateQuestion();
         startTimer();
-        
+
         // 设置5秒后的会话验证
         sessionCheckTimer5 = setTimeout(() => {
             checkSession();

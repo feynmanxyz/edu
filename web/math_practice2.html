@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>二年级数学口算练习</title>
+    <title>2nd Grade Math Practice</title>
     <style>
         * {
             margin: 0;
@@ -263,50 +263,50 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎯 二年级数学口算练习</h1>
+        <h1>🎯 2nd Grade Math Practice</h1>
         
         <div id="gameArea">
             <div class="timer-section">
-                <div class="timer-label">⏰ 用眼休息</div>
+                <div class="timer-label">⏰ Eye Rest</div>
                 <div class="timer" id="timer">10:00</div>
             </div>
 
             <div class="score-section">
                 <div class="genius-section">
                     <span class="genius-icon">⭐</span>
-                    <span>小天才</span>
+                    <span>Little Genius</span>
                 </div>
                 <div class="awards" id="awards"></div>
                 <div class="score-item">
-                    <span class="score-label">得分</span>
+                    <span class="score-label">Score</span>
                     <span class="score-value" id="score">0</span>
                 </div>
             </div>
 
             <div class="question-section">
-                <div class="question" id="question">准备开始...</div>
+                <div class="question" id="question">Ready to start...</div>
                 <div class="input-section">
-                    <input type="number" id="answer" placeholder="输入答案" autocomplete="off">
-                    <button onclick="checkAnswer()">提交</button>
+                    <input type="number" id="answer" placeholder="Enter answer" autocomplete="off">
+                    <button onclick="checkAnswer()">Submit</button>
                 </div>
                 <div class="message" id="message"></div>
             </div>
 
             <div class="rules">
-                📌 <strong>规则：</strong>每答对一题得1分，每5分得一个奖杯徽章🏆
+                📌 <strong>Rules:</strong> Earn 1 point for each correct answer, get a trophy badge🏆 for every 5 points
             </div>
         </div>
 
         <div id="gameOver" class="game-over hidden">
-            <h2>🎉 练习结束！</h2>
+            <h2>🎉 Practice Complete!</h2>
             <div class="celebration">🌟✨🎊</div>
-            <div>你的最终得分：</div>
+            <div>Your Final Score:</div>
             <div class="final-score" id="finalScore">0</div>
             <div class="awards" id="finalAwards"></div>
             <div style="margin-top: 20px; font-size: 18px; color: #666;">
-                太棒了！记得休息一下眼睛哦！
+                Great job! Remember to rest your eyes!
             </div>
-            <button class="restart-btn" onclick="restartGame()">再来一次</button>
+            <button class="restart-btn" onclick="restartGame()">Play Again</button>
         </div>
     </div>
 
@@ -412,7 +412,7 @@
             const messageEl = document.getElementById('message');
 
             if (isNaN(userAnswer)) {
-                messageEl.textContent = '请输入答案！';
+                messageEl.textContent = 'Please enter an answer!';
                 messageEl.className = 'message wrong';
                 return;
             }
@@ -421,7 +421,7 @@
                 // 答对了
                 score++;
                 document.getElementById('score').textContent = score;
-                messageEl.textContent = '✓ 太棒了！答对了！';
+                messageEl.textContent = '✓ Excellent! Correct!';
                 messageEl.className = 'message correct';
 
                 // 星星特效
@@ -450,12 +450,12 @@
             } else {
                 attempts++;
                 if (attempts === 1) {
-                    messageEl.textContent = '✗ 再想想看，再试一次！';
+                    messageEl.textContent = '✗ Think again, try once more!';
                     messageEl.className = 'message wrong';
                     document.getElementById('answer').value = '';
                     document.getElementById('answer').focus();
                 } else {
-                    messageEl.textContent = `✗ 正确答案是 ${currentQuestion.answer}，继续加油！`;
+                    messageEl.textContent = `✗ The correct answer is ${currentQuestion.answer}, keep going!`;
                     messageEl.className = 'message wrong';
                     setTimeout(() => {
                         generateQuestion();

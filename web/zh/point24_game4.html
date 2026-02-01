@@ -187,30 +187,183 @@
             color: #fa5252;
             font-style: italic;
         }
+
+        .trophy-container {
+            text-align: center;
+            min-height: 40px;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .trophy {
+            display: inline-block;
+            animation: trophyPop 0.5s ease-out;
+            margin: 0 5px;
+        }
+
+        @keyframes trophyPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .button-pad {
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .number-buttons, .operator-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .operator-buttons {
+            margin-bottom: 0;
+        }
+
+        .pad-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2em;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .pad-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .pad-btn:active {
+            transform: translateY(0);
+        }
+
+        .pad-btn.operator {
+            background: #fff3bf;
+            color: #f08c00;
+        }
+
+        .pad-btn.clear {
+            background: #ffe3e3;
+            color: #c92a2a;
+            width: 80px;
+        }
+
+        .pad-btn.backspace {
+            background: #e3f2ff;
+            color: #1971c2;
+            width: 60px;
+        }
+
+        .close-button-container {
+            margin-top: 30px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .close-page-btn {
+            background: #868e96;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .close-page-btn:hover {
+            background: #495057;
+            transform: translateY(-2px);
+        }
+
+        .star {
+            position: fixed;
+            font-size: 2em;
+            animation: starFall 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes starFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .funny-emoji {
+            font-size: 3em;
+            text-align: center;
+            margin: 20px 0;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="trophy-container" id="trophyContainer"></div>
+        
         <h1>🎯 24点游戏</h1>
         
         <div class="numbers-display" id="numbersDisplay"></div>
         
         <div class="timer" id="timer">答案显示时间: 200秒</div>
         
+        <div class="button-pad">
+            <div class="number-buttons" id="numberButtons">
+                <!-- 数字按钮将动态生成 -->
+            </div>
+            <div class="operator-buttons">
+                <button class="pad-btn operator" onclick="insertSymbol('+')">+</button>
+                <button class="pad-btn operator" onclick="insertSymbol('-')">-</button>
+                <button class="pad-btn operator" onclick="insertSymbol('*')">×</button>
+                <button class="pad-btn operator" onclick="insertSymbol('/')">/</button>
+                <button class="pad-btn operator" onclick="insertSymbol('(')">(</button>
+                <button class="pad-btn operator" onclick="insertSymbol(')')">)</button>
+                <button class="pad-btn clear" onclick="clearInput()">清</button>
+                <button class="pad-btn backspace" onclick="backspace()">⌫</button>
+            </div>
+        </div>
+        
         <div class="input-section">
-            <label for="answer">输入你的算式（例如: (1+2)*3+4）：</label>
+            <label for="answer">输入你的算式（例如：(1+2)*3+4）：</label>
             <input type="text" id="answer" placeholder="请输入算式...">
         </div>
         
         <div class="buttons">
-            <button class="show-answer-btn" onclick="showAnswerNow()">看答案</button>
-            <button class="submit-btn" onclick="submitAnswer()"> 提 交 答 案 </button>
             <button class="new-game-btn" onclick="newGame()">新游戏</button>
+            <button class="submit-btn" onclick="submitAnswer()">提交答案</button>
+            <button class="show-answer-btn" onclick="showAnswerNow()">显示答案</button>
         </div>
         
         <div id="message"></div>
         
         <div id="solutionsContainer"></div>
+        
+        <div class="close-button-container">
+            <button class="close-page-btn" onclick="window.close()">关闭页面</button>
+        </div>
     </div>
 
     <script>
@@ -218,6 +371,66 @@
         let timer = null;
         let timeLeft = 200;
         let gameActive = false;
+        let correctAnswers = 0;
+
+        // 创建星星庆祝效果
+        function createStars() {
+            const starSymbols = ['⭐', '🌟', '✨', '💫', '🎉', '🎊'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.textContent = starSymbols[Math.floor(Math.random() * starSymbols.length)];
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = -50 + 'px';
+                    document.body.appendChild(star);
+                    
+                    setTimeout(() => {
+                        star.remove();
+                    }, 2000);
+                }, i * 50);
+            }
+        }
+
+        // 添加奖杯
+        function addTrophy() {
+            correctAnswers++;
+            const trophyContainer = document.getElementById('trophyContainer');
+            const trophy = document.createElement('span');
+            trophy.className = 'trophy';
+            trophy.textContent = '🏆';
+            trophyContainer.appendChild(trophy);
+        }
+
+        // 插入符号到输入框
+        function insertSymbol(symbol) {
+            const input = document.getElementById('answer');
+            const cursorPos = input.selectionStart;
+            const textBefore = input.value.substring(0, cursorPos);
+            const textAfter = input.value.substring(cursorPos);
+            input.value = textBefore + symbol + textAfter;
+            input.focus();
+            input.setSelectionRange(cursorPos + 1, cursorPos + 1);
+        }
+
+        // 清空输入框
+        function clearInput() {
+            document.getElementById('answer').value = '';
+            document.getElementById('answer').focus();
+        }
+
+        // 退格
+        function backspace() {
+            const input = document.getElementById('answer');
+            const cursorPos = input.selectionStart;
+            if (cursorPos > 0) {
+                const textBefore = input.value.substring(0, cursorPos - 1);
+                const textAfter = input.value.substring(cursorPos);
+                input.value = textBefore + textAfter;
+                input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+            }
+            input.focus();
+        }
 
         // 生成随机数字
         function generateNumbers() {
@@ -237,6 +450,22 @@
                 card.className = 'number-card';
                 card.textContent = num;
                 display.appendChild(card);
+            });
+            
+            // 生成数字按钮
+            generateNumberButtons();
+        }
+
+        // 生成数字按钮
+        function generateNumberButtons() {
+            const buttonContainer = document.getElementById('numberButtons');
+            buttonContainer.innerHTML = '';
+            currentNumbers.forEach(num => {
+                const button = document.createElement('button');
+                button.className = 'pad-btn';
+                button.textContent = num;
+                button.onclick = () => insertSymbol(num);
+                buttonContainer.appendChild(button);
             });
         }
 
@@ -314,6 +543,8 @@
             showMessage(result.message, result.valid);
             
             if (result.valid) {
+                createStars();
+                addTrophy();
                 clearInterval(timer);
                 gameActive = false;
                 setTimeout(() => {
@@ -389,16 +620,20 @@
             if (solutions.length > 0) {
                 container.innerHTML = `
                     <div class="solutions">
-                        <h3>所有可能的解法 (共${solutions.length}个)：</h3>
+                        <h3>所有可能的解法（共${solutions.length}个）：</h3>
                         <ul>
                             ${solutions.map(sol => `<li>${sol} = 24</li>`).join('')}
                         </ul>
                     </div>
                 `;
             } else {
+                const funnyEmojis = ['🤷‍♂️', '😅', '🙈', '🤔', '😬', '🫠', '😵‍💫', '🤯', '💀', '😱'];
+                const randomEmoji = funnyEmojis[Math.floor(Math.random() * funnyEmojis.length)];
                 container.innerHTML = `
                     <div class="solutions">
+                        <div class="funny-emoji">${randomEmoji}</div>
                         <h3 class="no-solution">这组数字无解！</h3>
+                        <p style="text-align: center; color: #868e96; margin-top: 10px;">别担心，这很正常！开始新游戏吧。</p>
                     </div>
                 `;
             }

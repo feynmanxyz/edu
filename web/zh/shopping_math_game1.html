@@ -36,26 +36,52 @@
 
         .score-board {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
+            align-items: center;
             margin: 15px 0;
-            padding: 12px;
+            padding: 12px 20px;
             background: #f0f4ff;
             border-radius: 10px;
         }
 
         .score-item {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-icon {
+            font-size: 2em;
         }
 
         .score-label {
-            font-size: 0.85em;
-            color: #666;
+            font-size: 1em;
+            font-weight: bold;
+            color: #667eea;
         }
 
         .score-value {
             font-size: 1.6em;
             font-weight: bold;
             color: #667eea;
+        }
+
+        .trophies-display {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .trophy-item {
+            font-size: 2em;
+            animation: trophy-pop 0.5s;
+        }
+
+        @keyframes trophy-pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         .shop-area {
@@ -75,7 +101,7 @@
 
         .shelves {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-bottom: 15px;
         }
@@ -249,6 +275,161 @@
             animation: award-pop 0.5s;
         }
 
+        .star-effect {
+            position: fixed;
+            font-size: 2em;
+            pointer-events: none;
+            animation: star-fall 2s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes star-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(100px) rotate(180deg) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(300px) rotate(360deg) scale(0.5);
+            }
+        }
+
+        .number-pad {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin: 15px auto;
+            max-width: 400px;
+        }
+
+        .number-btn {
+            padding: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .number-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .number-btn:active {
+            transform: scale(0.95);
+        }
+
+        .number-btn.clear {
+            background: #e74c3c;
+            grid-column: span 2;
+        }
+
+        .number-btn.clear:hover {
+            background: #c0392b;
+        }
+
+        #num-submit-btn {
+            background: #4caf50;
+            grid-column: span 3;
+        }
+
+        #num-submit-btn:hover {
+            background: #45a049;
+        }
+
+        .wanted-items-display {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 10px;
+            border: 2px dashed #ffc107;
+        }
+
+        .wanted-items-title {
+            font-size: 1em;
+            color: #856404;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .wanted-items-list {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .game-over-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .end-game-btn, .close-page-btn {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .end-game-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .end-game-btn:hover {
+            background: #ee5a52;
+            transform: scale(1.05);
+        }
+
+        .close-page-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .close-page-btn:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+
+        .final-result {
+            display: none;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .final-result h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .final-stats {
+            font-size: 1.3em;
+            margin: 15px 0;
+        }
+
+        .final-trophies {
+            font-size: 3em;
+            margin: 20px 0;
+        }
+
         @keyframes award-pop {
             0% { transform: scale(0); }
             50% { transform: scale(1.2); }
@@ -274,23 +455,24 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏪 Little Shop - Math Game</h1>
+        <h1>🏪 一年级商店数学游戏</h1>
         
         <div class="score-board">
             <div class="score-item">
-                <div class="score-label">Current Score</div>
-                <div class="score-value" id="score">0</div>
+                <span class="score-icon">⭐</span>
+                <span class="score-label">小帮手</span>
             </div>
             <div class="score-item">
-                <div class="score-label">Correct Answers</div>
-                <div class="score-value" id="correct-count">0</div>
+                <div class="trophies-display" id="trophies"></div>
+            </div>
+            <div class="score-item">
+                <span class="score-icon">🏅</span>
+                <span class="score-value" id="score">0</span>
             </div>
         </div>
 
-        <div class="awards" id="awards"></div>
-
         <div class="shop-area">
-            <div class="shop-title">🛒 Shop Shelves</div>
+            <div class="shop-title">🛒 货架商品单价</div>
             <div class="shelves" id="shelves"></div>
         </div>
 
@@ -298,46 +480,75 @@
             <div class="customer-speech">
                 <div class="customer-emoji">👧</div>
                 <div class="speech-bubble">
-                    <div class="speech-text" id="customer-text">
-                        Hello! I want to buy two items, they are <span class="wanted-items" id="wanted-items"></span>. How much do I need to pay in total?
+                    <div class="speech-text">
+                        你好，我想要买些东西。请帮我计算需要付多少钱？
+                    </div>
+                    <div class="wanted-items-display">
+                        <div class="wanted-items-title">我要买:</div>
+                        <div class="wanted-items-list" id="wanted-items"></div>
                     </div>
                 </div>
             </div>
 
+            <div class="number-pad" id="number-pad">
+                <button class="number-btn" data-num="1">1</button>
+                <button class="number-btn" data-num="2">2</button>
+                <button class="number-btn" data-num="3">3</button>
+                <button class="number-btn" data-num="4">4</button>
+                <button class="number-btn" data-num="5">5</button>
+                <button class="number-btn" data-num="6">6</button>
+                <button class="number-btn" data-num="7">7</button>
+                <button class="number-btn" data-num="8">8</button>
+                <button class="number-btn" data-num="9">9</button>
+                <button class="number-btn" data-num="0">0</button>
+                <button class="number-btn clear" id="clear-btn">清空</button>
+                <button class="number-btn" id="num-submit-btn">✓ 提交答案</button>
+            </div>
+
             <div class="answer-area">
-                <label class="answer-label" for="answer-input">💰 Total:</label>
-                <input type="number" id="answer-input" placeholder="?" min="0">
-                <span class="answer-label">dollars</span>
-                <button id="submit-btn">Submit</button>
+                <label class="answer-label" for="answer-input">💰 要付:</label>
+                <input type="number" id="answer-input" placeholder="?" min="0" readonly>
+                <span class="answer-label">元</span>
             </div>
 
             <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="game-over-area">
+            <button class="end-game-btn" id="end-game-btn">结束游戏</button>
+            <div class="final-result" id="final-result">
+                <h2>🎊 谢谢你，小帮手! 🎊</h2>
+                <div class="final-stats">
+                    <div>你的得分: <strong id="final-score">0</strong> 🏅</div>
+                    <div class="final-trophies" id="final-trophies"></div>
+                </div>
+                <button class="close-page-btn" id="close-page-btn">关闭本页</button>
+            </div>
         </div>
     </div>
 
     <script>
         const items = [
-            { name: 'Apple', emoji: '🍎', price: 3 },
-            { name: 'Banana', emoji: '🍌', price: 2 },
-            { name: 'Orange', emoji: '🍊', price: 4 },
-            { name: 'Watermelon', emoji: '🍉', price: 8 },
-            { name: 'Milk', emoji: '🥛', price: 5 },
-            { name: 'Bread', emoji: '🍞', price: 6 },
-            { name: 'Cookie', emoji: '🍪', price: 3 },
-            { name: 'Cake', emoji: '🍰', price: 10 },
-            { name: 'Ice Cream', emoji: '🍦', price: 7 },
-            { name: 'Candy', emoji: '🍬', price: 2 },
-            { name: 'Chocolate', emoji: '🍫', price: 5 },
-            { name: 'Juice', emoji: '🧃', price: 4 },
-            { name: 'Strawberry', emoji: '🍓', price: 6 },
-            { name: 'Grape', emoji: '🍇', price: 7 },
-            { name: 'Chips', emoji: '🥔', price: 4 }
+            { name: '苹果', emoji: '🍎', price: 3 },
+            { name: '香蕉', emoji: '🍌', price: 2 },
+            { name: '橙子', emoji: '🍊', price: 4 },
+            { name: '西瓜', emoji: '🍉', price: 8 },
+            { name: '牛奶', emoji: '🥛', price: 5 },
+            { name: '蛋糕', emoji: '🍰', price: 11 },
+            { name: '冰淇淋', emoji: '🍦', price: 7 },
+            { name: '糖果', emoji: '🍬', price: 3 },
+            { name: '巧克力', emoji: '🍫', price: 10 },
+            { name: '果汁', emoji: '🧃', price: 5 },
+            { name: '草莓', emoji: '🍓', price: 6 },
+            { name: '葡萄', emoji: '🍇', price: 9 },
         ];
 
         let score = 0;
         let correctCount = 0;
         let currentItems = [];
         let correctAnswer = 0;
+        let trophyCount = 0;
+        let gameActive = true;
 
         function shuffleArray(array) {
             const newArray = [...array];
@@ -359,19 +570,52 @@
                 itemDiv.innerHTML = `
                     <div class="item-emoji">${item.emoji}</div>
                     <div class="item-name">${item.name}</div>
-                    <div class="item-price">$${item.price}</div>
+                    <div class="item-price">￥${item.price}</div>
                 `;
                 shelvesDiv.appendChild(itemDiv);
             });
         }
 
-        function newQuestion() {
+        function generateQuestion() {
+            //const questionType = Math.floor(Math.random() * 3);
+	    const questionType=0;
             const shuffled = shuffleArray(items);
-            currentItems = [shuffled[0], shuffled[1]];
-            correctAnswer = currentItems[0].price + currentItems[1].price;
+            currentItems = [];
+            correctAnswer = 0;
 
-            const wantedItemsSpan = document.getElementById('wanted-items');
-            wantedItemsSpan.textContent = `${currentItems[0].emoji}${currentItems[0].name} and ${currentItems[1].emoji}${currentItems[1].name}`;
+            if (questionType === 0) {
+                // 2种商品，各1个
+                for (let i = 0; i < 2; i++) {
+                    currentItems.push({ item: shuffled[i], quantity: 1 });
+                    correctAnswer += shuffled[i].price;
+                }
+            } else if (questionType === 1) {
+                // 4种商品，各1个
+                for (let i = 0; i < 4; i++) {
+                    currentItems.push({ item: shuffled[i], quantity: 1 });
+                    correctAnswer += shuffled[i].price;
+                }
+            } else {
+                // 2种商品，其中一种多份
+                const quantity = Math.floor(Math.random() * 3) + 2; // 2-4份
+                currentItems.push({ item: shuffled[0], quantity: quantity });
+                currentItems.push({ item: shuffled[1], quantity: 1 });
+                correctAnswer = shuffled[0].price * quantity + shuffled[1].price;
+            }
+        }
+
+        function newQuestion() {
+            if (!gameActive) return;
+            
+            generateQuestion();
+
+            const wantedItemsList = document.getElementById('wanted-items');
+            const itemsText = currentItems.map(ci => 
+                ci.quantity > 1 
+                    ? `${ci.item.emoji}${ci.item.name} x${ci.quantity}` 
+                    : `${ci.item.emoji}${ci.item.name}`
+            ).join(', ');
+            wantedItemsList.textContent = itemsText;
 
             document.getElementById('answer-input').value = '';
             document.getElementById('feedback').textContent = '';
@@ -379,11 +623,13 @@
         }
 
         function checkAnswer() {
+            if (!gameActive) return;
+            
             const userAnswer = parseInt(document.getElementById('answer-input').value);
             const feedback = document.getElementById('feedback');
 
-            if (isNaN(userAnswer)) {
-                feedback.textContent = 'Please enter a number!';
+            if (isNaN(userAnswer) || userAnswer === 0) {
+                feedback.textContent = '请输入数字!';
                 feedback.className = 'feedback incorrect';
                 return;
             }
@@ -391,36 +637,67 @@
             if (userAnswer === correctAnswer) {
                 score++;
                 correctCount++;
-                feedback.textContent = `🎉 Great job! Correct! ${currentItems[0].name} $${currentItems[0].price} + ${currentItems[1].name} $${currentItems[1].price} = $${correctAnswer}`;
+                
+                // 构建计算说明
+                const calculation = currentItems.map(ci => 
+                    ci.quantity > 1 
+                        ? `${ci.item.name} ￥${ci.item.price} x${ci.quantity}` 
+                        : `${ci.item.name} ￥${ci.item.price}`
+                ).join(' + ');
+                
+                feedback.textContent = `🎉 正确，你太棒了!  ${calculation} = ￥${correctAnswer}`;
                 feedback.className = 'feedback correct';
 
                 document.getElementById('score').textContent = score;
-                document.getElementById('correct-count').textContent = correctCount;
 
-                // 每5分给一个奖励
+                // 显示星星特效
+                createStarEffect();
+
+                // 每5分给一个奖杯
                 if (score % 5 === 0) {
-                    addAward();
+                    addTrophy();
                     showCelebration();
                 }
 
                 setTimeout(() => {
                     newQuestion();
-                }, 2000);
+                }, 2500);
             } else {
-                feedback.textContent = `❌ Try again! ${currentItems[0].name} $${currentItems[0].price} + ${currentItems[1].name} $${currentItems[1].price} = ?`;
+                const calculation = currentItems.map(ci => 
+                    ci.quantity > 1 
+                        ? `${ci.item.name} $${ci.item.price} x${ci.quantity}` 
+                        : `${ci.item.name} $${ci.item.price}`
+                ).join(' + ');
+                
+                feedback.textContent = `❌ 不对，再试试! ${calculation} = ?`;
                 feedback.className = 'feedback incorrect';
             }
         }
 
-        function addAward() {
-            const awards = ['🏆', '🥇', '⭐', '🎖️', '👑', '💎'];
-            const randomAward = awards[Math.floor(Math.random() * awards.length)];
-            const awardsDiv = document.getElementById('awards');
-            
-            const awardSpan = document.createElement('span');
-            awardSpan.className = 'award';
-            awardSpan.textContent = randomAward;
-            awardsDiv.appendChild(awardSpan);
+        function createStarEffect() {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const star = document.createElement('div');
+                    star.className = 'star-effect';
+                    star.textContent = '⭐';
+                    star.style.left = Math.random() * window.innerWidth + 'px';
+                    star.style.top = Math.random() * 200 + 'px';
+                    document.body.appendChild(star);
+
+                    setTimeout(() => {
+                        document.body.removeChild(star);
+                    }, 2000);
+                }, i * 100);
+            }
+        }
+
+        function addTrophy() {
+            trophyCount++;
+            const trophiesDiv = document.getElementById('trophies');
+            const trophy = document.createElement('span');
+            trophy.className = 'trophy-item';
+            trophy.textContent = '🏆';
+            trophiesDiv.appendChild(trophy);
         }
 
         function showCelebration() {
@@ -434,11 +711,44 @@
             }, 1000);
         }
 
-        document.getElementById('submit-btn').addEventListener('click', checkAnswer);
+        document.getElementById('num-submit-btn').addEventListener('click', checkAnswer);
         document.getElementById('answer-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 checkAnswer();
             }
+        });
+
+        // 数字按钮事件
+        document.querySelectorAll('.number-btn[data-num]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = document.getElementById('answer-input');
+                input.value = (input.value || '') + btn.dataset.num;
+            });
+        });
+
+        // 清除按钮
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            document.getElementById('answer-input').value = '';
+        });
+
+        // 结束游戏按钮
+        document.getElementById('end-game-btn').addEventListener('click', () => {
+            gameActive = false;
+            document.getElementById('final-score').textContent = score;
+            
+            const finalTrophiesDiv = document.getElementById('final-trophies');
+            finalTrophiesDiv.innerHTML = '';
+            for (let i = 0; i < trophyCount; i++) {
+                finalTrophiesDiv.innerHTML += '🏆 ';
+            }
+            
+            document.getElementById('final-result').style.display = 'block';
+            document.getElementById('end-game-btn').style.display = 'none';
+        });
+
+        // 关闭页面按钮
+        document.getElementById('close-page-btn').addEventListener('click', () => {
+            window.close();
         });
 
         // 初始化游戏

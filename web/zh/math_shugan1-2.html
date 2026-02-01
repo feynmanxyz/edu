@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gr1 Number Sense</title>
+    <title>一年级数感</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -228,60 +228,6 @@
             color: #e74c3c;
         }
 
-        .zero-marker {
-            position: absolute;
-            top: -40px;
-            transform: translateX(-50%);
-            font-size: 1em;
-            font-weight: bold;
-            color: #2c3e50;
-            background: #fff;
-            padding: 1px 5px;
-            border-radius: 5px;
-            border: 2px solid #2c3e50;
-        }
-
-        .animal-icon {
-            position: absolute;
-            top: -50px;
-            transform: translateX(-50%);
-            font-size: 2.5em;
-            animation: hop 0.5s ease-in-out;
-        }
-
-        @keyframes hop {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-15px); }
-        }
-
-        .jump-arc {
-            position: absolute;
-            top: -25px;
-            height: 60px;
-            border: 4px dashed #27ae60;
-            border-bottom: none;
-            border-left: none;
-            border-right: none;
-            border-top-left-radius: 100%;
-            border-top-right-radius: 100%;
-            opacity: 0.7;
-        }
-
-        .jump-instruction {
-            position: absolute;
-            top: -80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #fff3cd;
-            padding: 8px 15px;
-            border-radius: 10px;
-            border: 2px solid #ffc107;
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #856404;
-            white-space: nowrap;
-        }
-
         .input-area {
             text-align: center;
             margin-bottom: 20px;
@@ -422,7 +368,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Gr1 Number Sense:  Addition (Jump from Any Point)</h1>
+            <h1>一年级数感：数轴整加十百千</h1>
         </div>
 
         <div id="gameScreen">
@@ -439,7 +385,7 @@
             </div>
 
             <div class="timer">
-                Eye Rest Timer：<span id="timerDisplay">5:00</span>
+                用眼休息：<span id="timerDisplay">5:00</span>
             </div>
 
             <div class="number-line-container">
@@ -449,7 +395,7 @@
             </div>
 
             <div class="question-prompt" id="questionPrompt">
-                ❓ What is the position after jumping once more from the starting point?
+                ❓ 红色点的数值是多少？
             </div>
 
             <div class="input-area">
@@ -457,18 +403,17 @@
             </div>
 
             <div style="text-align: center;">
-                <button class="submit-btn" id="submitBtn">Submit Answer</button>
+                <button class="submit-btn" id="submitBtn">提交答案</button>
             </div>
 
             <div class="feedback" id="feedback"></div>
 
-            <div class="hint">Observe the landing point of the first jump to determine how many squares to jump each time. Count the number of squares after the second jump, noting that the jumps are in reverse order. 
-                <br>Earn 1 point for each correct answer, deduct 1 point for consecutive incorrect answers, and receive a badge for every 5 points earned. Good luck!
+            <div class="hint">观察相邻两个绿点的数值，理解单位间距，再数出红点的数值。<br>每次答对得1分，连续答错扣1分，每得5分得一个徽章。加油！
             </div>
 
             <div class="end-btn-container">
-                <button class="submit-btn end-btn" id="endBtn">End Game</button>
-                <br><button class="submit-btn end-btn" id="closeBtn1" onclick="closeWindow()" style="margin-top: 15px; background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">Close Window</button>
+                <button class="submit-btn end-btn" id="endBtn">结束并保存</button>
+                <br><button class="submit-btn end-btn" id="closeBtn1" onclick="closeWindow()" style="margin-top: 15px; background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">关闭本页</button>
             </div>
         </div>
 
@@ -481,23 +426,17 @@
         let sessionCheckTimer5 = null; // 5秒验证计时器
         let sessionCheckTimer60 = null; // 60秒验证计时器
         // 游戏状态
-        let failmax=4; //define fail max cnt
+        let failmax=3; //define fail max cnt
         let failcnt=0;
         let score = 0;
         let currentAnswer = 0;
         let timeLeft = 300; // 5分钟 = 300秒
         let timerInterval = null;
         let gameActive = true;
-        let jumpStep = 2; // 每次跳跃的间隔（2-5）
-        let totalJumps = 5; // 总跳跃次数（2-10）
-        let currentAnimal = 'fa-dog'; // 当前动物图标
-        let startPoint = 0; // 起点位置
-
-        // 动物图标库
-        const animalIcons = [
-            'fa-dog', 'fa-horse', 'fa-cat', 'fa-frog', 
-            'fa-crow', 'fa-hippo', 'fa-spider', 'fa-kiwi-bird'
-        ];
+        let knownValue1 = 0; // 第一个已知点
+        let knownValue2 = 0; // 第二个已知点（相邻）
+        let unknownValue = 0; // 未知点
+        let unitStep = 10; // 单位间距（10/100/1000）
 
         // 会话验证函数
         async function checkSession() {
@@ -590,109 +529,71 @@
             const mainLine = document.getElementById('mainLine');
             mainLine.innerHTML = '';
             
-            // 随机选择动物图标
-            currentAnimal = animalIcons[Math.floor(Math.random() * animalIcons.length)];
+            // 随机选择单位间距：10, 100, 或 1000
+            const steps = [10, 100, 1000];
+            unitStep = steps[Math.floor(Math.random() * steps.length)];
             
-            // 随机选择起点（1-20之间）
-            startPoint = Math.floor(Math.random() * 80) + 1; // 1-20
-            
-            // 随机选择每次跳跃的间隔（2-5）
-            jumpStep = Math.floor(Math.random() * 4) + 2; // 2, 3, 4, 5
-                        
-            // 计算第一次跳跃和最终落点
-            const firstJumpValue = startPoint + jumpStep;
-            const finalPosition = startPoint + (jumpStep * 2); // totalJumps);
-            currentAnswer = finalPosition;
-            
-            // 数轴范围：从起点前几格到最终落点后几格
-            const minValue = Math.max(0, startPoint - 3);
-            const maxValue = finalPosition + 3;
-            const totalRange = maxValue - minValue;
-            
-            // 绘制刻度线（每个单位一个刻度）
-            for (let i = 0; i <= totalRange; i++) {
-                const tick = document.createElement('div');
-                tick.className = 'tick';
-                tick.style.left = `${(i / totalRange) * 100}%`;
-                mainLine.appendChild(tick);
+            // 根据单位间距生成合适范围的起始值
+            let startValue;
+            if (unitStep === 10) {
+                // 10的间距：起始值范围 110-9900
+                startValue = (Math.floor(Math.random() * 980) + 11) * 10;
+            } else if (unitStep === 100) {
+                // 100的间距：起始值范围 1100-19900
+                startValue = (Math.floor(Math.random() * 189) + 11) * 100;
+            } else { // 1000
+                // 1000的间距：起始值范围 11000-199000
+                startValue = (Math.floor(Math.random() * 189) + 11) * 1000;
             }
             
-            // 标记起点（蓝色点）
-            const startPosition = ((startPoint - minValue) / totalRange) * 100;
-            const startMarker = document.createElement('div');
-            startMarker.className = 'point';
-            startMarker.style.left = `${startPosition}%`;
-            startMarker.style.background = '#3498db';
-            startMarker.style.boxShadow = '0 0 0 4px rgba(52, 152, 219, 0.3)';
-            mainLine.appendChild(startMarker);
+            // 设置两个相邻的已知点
+            knownValue1 = startValue;
+            knownValue2 = startValue + unitStep;
             
-            // 添加"起点"标签（在数轴上方）
-            const startLabel = document.createElement('div');
-            startLabel.className = 'label';
-            startLabel.textContent = 'Start';
-            startLabel.style.left = `${startPosition}%`;
-            startLabel.style.color = '#3498db';
-            startLabel.style.top = '-50px';
-            startLabel.style.fontSize = '1.2em';
-            startLabel.style.fontWeight = 'bold';
-            mainLine.appendChild(startLabel);
+            // 随机决定未知点的位置（在已知点前面、中间或后面）
+            const position = Math.floor(Math.random() * 3); // 0: 前面, 1: 中间某处, 2: 后面
             
-            // 添加起点数值标签（在数轴下方）
-            const startValueLabel = document.createElement('div');
-            startValueLabel.className = 'label';
-            startValueLabel.textContent = startPoint;
-            startValueLabel.style.left = `${startPosition}%`;
-            startValueLabel.style.color = '#3498db';
-            startValueLabel.style.top = '30px';
-            startValueLabel.style.fontSize = '1.4em';
-            startValueLabel.style.fontWeight = 'bold';
-            mainLine.appendChild(startValueLabel);
+            if (position === 0) {
+                // 未知点在两个已知点前面（1-3格）
+                const distance = Math.floor(Math.random() * 4) + 1;
+                unknownValue = knownValue1 - distance * unitStep;
+                // 确保为正数
+                if (unknownValue <= 0) {
+                    unknownValue = knownValue2 + (Math.floor(Math.random() * 4) + 1) * unitStep;
+                }
+            } else if (position === 2) {
+                // 未知点在两个已知点后面（1-3格）
+                const distance = Math.floor(Math.random() * 4) + 1;
+                unknownValue = knownValue2 + distance * unitStep;
+            } else {
+                // 未知点在两个已知点之间或附近（前1格或后1-2格）
+                const rand = Math.random();
+                if (rand < 0.3) {
+                    unknownValue = knownValue1 - unitStep; // 前1格
+                    if (unknownValue <= 0) {
+                        unknownValue = knownValue2 + unitStep; // 改为后1格
+                    }
+                } else {
+                    unknownValue = knownValue2 + (Math.floor(Math.random() * 4) + 1) * unitStep; // 后1-2格
+                }
+            }
             
-            // 标记第一次跳跃的落点（绿色已知点）
-            const firstJumpPosition = ((firstJumpValue - minValue) / totalRange) * 100;
-            const firstJumpPoint = document.createElement('div');
-            firstJumpPoint.className = 'point known-point';
-            firstJumpPoint.style.left = `${firstJumpPosition}%`;
-            mainLine.appendChild(firstJumpPoint);
+            currentAnswer = unknownValue;
             
-            const firstJumpLabel = document.createElement('div');
-            firstJumpLabel.className = 'label known-label';
-            firstJumpLabel.textContent = firstJumpValue;
-            firstJumpLabel.style.left = `${firstJumpPosition}%`;
-            firstJumpLabel.style.fontSize = '1.4em';
-            firstJumpLabel.style.fontWeight = 'bold';
-            mainLine.appendChild(firstJumpLabel);
-
-            // 标记最终落点（红色未知点）
-            const finalPosPercent = ((finalPosition - minValue) / totalRange) * 100;
-            const finalPoint = document.createElement('div');
-            finalPoint.className = 'point unknown-point';
-            finalPoint.style.left = `${finalPosPercent}%`;
-            mainLine.appendChild(finalPoint);
+            // 计算数轴的范围
+            const allValues = [knownValue1, knownValue2, unknownValue];
+            const minValue = Math.min(...allValues) - unitStep;
+            const maxValue = Math.max(...allValues) + unitStep;
+            const totalRange = maxValue - minValue;
+            const tickCount = totalRange / unitStep;
             
-            const finalLabel = document.createElement('div');
-            finalLabel.className = 'label unknown-label';
-            finalLabel.textContent = '?';
-            finalLabel.style.left = `${finalPosPercent}%`;
-            mainLine.appendChild(finalLabel);
-            
-            // 在第一次跳跃位置添加动物图标
-            const animalIcon = document.createElement('i');
-            animalIcon.className = `fas ${currentAnimal} animal-icon`;
-            animalIcon.style.left = `${firstJumpPosition}%`;
-            animalIcon.style.color = '#27ae60';
-            mainLine.appendChild(animalIcon);
-            
-            // 添加从起点到第一次跳跃位置的弧线
-            const jumpArc = document.createElement('div');
-            jumpArc.className = 'jump-arc';
-            jumpArc.style.left = `${startPosition}%`;
-            jumpArc.style.width = `${firstJumpPosition - startPosition}%`;
-            mainLine.appendChild(jumpArc);
-            
-            // 更新问题提示
-            const questionPrompt = document.getElementById('questionPrompt');
-            questionPrompt.textContent = `❓ What will the position be after jumping once more? (Two jumps in total, red dot position)`;
+            // 绘制刻度线
+            for (let i = 0; i <= tickCount; i++) {
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                tick.style.left = `${(i / tickCount) * 100}%`;
+                mainLine.appendChild(tick);
+            }
             
             // 添加箭头表示正方向
             const arrow = document.createElement('div');
@@ -704,6 +605,50 @@
             arrowLabel.className = 'arrow-label';
             arrowLabel.textContent = '→';
             mainLine.appendChild(arrowLabel);
+            
+            // 计算各点的位置
+            const knownPosition1 = ((knownValue1 - minValue) / totalRange) * 100;
+            const knownPosition2 = ((knownValue2 - minValue) / totalRange) * 100;
+            const unknownPosition = ((unknownValue - minValue) / totalRange) * 100;
+            
+            // 创建第一个已知点（绿色）
+            const knownPoint1 = document.createElement('div');
+            knownPoint1.className = 'point known-point';
+            knownPoint1.style.left = `${knownPosition1}%`;
+            mainLine.appendChild(knownPoint1);
+            
+            // 创建第一个已知点标签
+            const knownLabel1 = document.createElement('div');
+            knownLabel1.className = 'label known-label';
+            knownLabel1.textContent = knownValue1;
+            knownLabel1.style.left = `${knownPosition1}%`;
+            mainLine.appendChild(knownLabel1);
+            
+            // 创建第二个已知点（绿色）
+            const knownPoint2 = document.createElement('div');
+            knownPoint2.className = 'point known-point';
+            knownPoint2.style.left = `${knownPosition2}%`;
+            mainLine.appendChild(knownPoint2);
+            
+            // 创建第二个已知点标签
+            const knownLabel2 = document.createElement('div');
+            knownLabel2.className = 'label known-label';
+            knownLabel2.textContent = knownValue2;
+            knownLabel2.style.left = `${knownPosition2}%`;
+            mainLine.appendChild(knownLabel2);
+            
+            // 创建未知点（红色）
+            const unknownPoint = document.createElement('div');
+            unknownPoint.className = 'point unknown-point';
+            unknownPoint.style.left = `${unknownPosition}%`;
+            mainLine.appendChild(unknownPoint);
+            
+            // 创建未知点标签
+            const unknownLabel = document.createElement('div');
+            unknownLabel.className = 'label unknown-label';
+            unknownLabel.textContent = '?';
+            unknownLabel.style.left = `${unknownPosition}%`;
+            mainLine.appendChild(unknownLabel);
         }
 
         // 创建星星效果
@@ -764,7 +709,7 @@
             const feedback = document.getElementById('feedback');
             
             if (isNaN(userAnswer)) {
-                feedback.textContent = 'Please Input Number！';
+                feedback.textContent = '请输入数字！';
                 feedback.className = 'feedback incorrect';
                 return;
             }
@@ -772,7 +717,7 @@
             if (userAnswer === currentAnswer) {
                 score++;
                 updateScore();
-                feedback.textContent = 'You got it right. Amazing!';
+                feedback.textContent = '答对了，你太棒了！';
                 feedback.className = 'feedback correct';
                 
                 // 检查是否获得徽章
@@ -795,17 +740,17 @@
                 failcnt=0;
             } else {
                 failcnt=failcnt+1;
-                if(failcnt<failmax)feedback.textContent = 'Keep going, try again!';
+                if(failcnt<failmax)feedback.textContent = '加油，再试一次！';
                 else if(failcnt==failmax){
                     score = Math.max(0, score - 1); // 扣1分，但不低于0
                     updateScore();
                     updateStamps(); // 同步更新徽章数量
-                    feedback.textContent = 'Keep trying! Check carefully and try again! (1 point has been deducted for consecutive errors.)';
+                    feedback.textContent = '加油，仔细检查后可再试一次！(连续不对，已扣1分)';
                 }else {
                     setTimeout(() => {
                         generateQuestion();
                     }, 1500);  // 延迟生成下一题
-                    feedback.textContent = 'If wrong after multiple times, switch to a new question.';
+                    feedback.textContent = '连续多次不对，更换新题。';
                 }
                 feedback.className = 'feedback incorrect';
                 document.getElementById('answerInput').value = '';
@@ -850,12 +795,12 @@
                 });
                 
                 if (response.ok) {
-                    console.log('Score uploaded successfully');
+                    console.log('分数上传成功');
                 } else {
-                    console.error('Score uploaded failed');
+                    console.error('分数上传失败');
                 }
             } catch (error) {
-                console.error('Score uploaded error:', error);
+                console.error('分数上传错误:', error);
             }
             
             const gameScreen = document.getElementById('gameScreen');
@@ -866,23 +811,23 @@
             
             let message = '';
             if (score < 15) {
-                message = 'Keep Going！';
+                message = '继续加油！';
             } else if (score < 25) {
-                message = 'You are awesome！';
+                message = '你真棒！';
             } else {
-                message = 'You are a little genius!！';
+                message = '你真是个小天才！';
             }
             
             const stampCount = Math.floor(score / 5);
             
             endScreen.innerHTML = `
-                <h2>🎉 Great, you have completed this exercise.！</h2>
-                <div class="final-score">The score：${score} </div>
-                <div class="final-score">Stamps：${stampCount} </div>
+                <h2>🎉 太棒了，你已完成本次练习！</h2>
+                <div class="final-score">本次得分：${score} 分</div>
+                <div class="final-score">获得徽章：${stampCount} 个</div>
                 <div class="message">${message}</div>
-                <div class="rest-message">Take a break; your eyes and brain need to relax. 😊</div>
-                <div class="rest-message" style="color: #27ae60; font-size: 1.2em; margin-top: 10px;">✓ Good Job.</div>
-                <button class="submit-btn restart-btn" onclick="restartGame()">Try Again</button>
+                <div class="rest-message">休息一下，眼睛和大脑都需要放松哦 😊</div>
+                <div class="rest-message" style="color: #27ae60; font-size: 1.2em; margin-top: 10px;">✓ 分数已经上传保存</div>
+                <button class="submit-btn restart-btn" onclick="restartGame()">再来一次</button>
             `;
         }
 
@@ -915,7 +860,7 @@
         // 初始化游戏
         generateQuestion();
         startTimer();
-        
+
         // 设置5秒后的会话验证
         sessionCheckTimer5 = setTimeout(() => {
             checkSession();
